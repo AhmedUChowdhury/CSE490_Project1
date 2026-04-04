@@ -27,7 +27,10 @@ module Register_File(
     input [15:0] write_data,
     input reg_write,
     output [15:0] read_data1,
-    output [15:0] read_data2
+    output [15:0] read_data2,
+    // debug port for FPGA display
+    input [3:0] debug_sel,
+    output [15:0] debug_data
 );
     reg [15:0] registers [0:15]; // 16 registers, 16 bits each
     integer i;
@@ -40,6 +43,7 @@ module Register_File(
     // async read
     assign read_data1 = registers[read_reg1];
     assign read_data2 = registers[read_reg2];
+    assign debug_data = registers[debug_sel];
 
     // sync write on rising edge
     always @(posedge clk) begin
