@@ -31,7 +31,8 @@ module Control_Unit(
     output reg BranchNE,
     output reg Jump,
     output reg [3:0] ALU_control,
-    output reg Addif
+    output reg Addif,
+    output reg ALUSwap
 );
     always @(*) begin
         // set defaults
@@ -45,11 +46,14 @@ module Control_Unit(
         Jump = 0;
         ALU_control = 4'b0000;
         Addif = 0;
+        ALUSwap = 0;
 
         case(opcode)
             4'b0000: begin // R-type
                 RegWrite = 1;
-                ALU_control = func_code; // use function code to select ALU op
+                ALU_control = func_code;
+                if (func_code == 4'b0010) // sll needs swapped inputs
+                    ALUSwap = 1;
             end
             4'b0001: begin // lw
                 RegWrite = 1;

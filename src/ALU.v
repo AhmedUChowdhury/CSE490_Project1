@@ -32,7 +32,7 @@ module ALU(
         case(ALU_control)
             4'b0000: ALU_result = A + B; // add
             4'b0001: ALU_result = A - B; // sub
-            4'b0010: ALU_result = B << A; // sll
+            4'b0010: ALU_result = A << B; // sll
             4'b0011: ALU_result = A & B; // and
             default: ALU_result = 16'b0;
         endcase

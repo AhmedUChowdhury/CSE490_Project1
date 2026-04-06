@@ -22,7 +22,7 @@ module Processor(
 
     // Control signals
     wire RegWrite, MemRead, MemWrite, ALUSrc, MemToReg;
-    wire Branch, BranchNE, Jump, Addif;
+    wire Branch, BranchNE, Jump, Addif, ALUSwap;
     wire [3:0] ALU_control;
 
     // Register File
@@ -33,6 +33,7 @@ module Processor(
 
     // ALU
     wire [15:0] ALU_input_A, ALU_input_B, ALU_result;
+    wire [15:0] ALU_pre_A, ALU_pre_B;
     wire Zero;
 
     // Data Memory
@@ -109,7 +110,8 @@ module Processor(
         .BranchNE(BranchNE),
         .Jump(Jump),
         .ALU_control(ALU_control),
-        .Addif(Addif)
+        .Addif(Addif),
+        .ALUSwap(ALUSwap)
     );
 
     // --- Register File ---
@@ -139,7 +141,7 @@ module Processor(
         .in0(read_data1),
         .in1(read_data2),
         .sel(Addif),
-        .out(ALU_input_A)
+        .out(ALU_pre_A)
     );
 
     // --- MUX: ALU input B (register vs immediate) ---
@@ -149,6 +151,22 @@ module Processor(
         .in0(read_data2),
         .in1(sign_ext_imm),
         .sel(ALUSrc),
+        .out(ALU_pre_B)
+    );
+
+    // --- MUX: swap ALU inputs for sll ---
+    //   ALUSwap=0 -> normal (A=pre_A, B=pre_B)
+    //   ALUSwap=1 -> swapped (A=pre_B, B=pre_A)
+    Mux2to1 mux_swap_a(
+        .in0(ALU_pre_A),
+        .in1(ALU_pre_B),
+        .sel(ALUSwap),
+        .out(ALU_input_A)
+    );
+    Mux2to1 mux_swap_b(
+        .in0(ALU_pre_B),
+        .in1(ALU_pre_A),
+        .sel(ALUSwap),
         .out(ALU_input_B)
     );
 
